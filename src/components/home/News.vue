@@ -1,20 +1,22 @@
 <script setup>
 import Card from './Card.vue'
-import api from '../hooks/api'
-import { onMounted, ref, watch } from 'vue'
+import api from '../../hooks/api'
+import { onMounted, ref, watch, reactive } from 'vue'
 import Skeleton from './Skeleton.vue'
 import { useRoute } from 'vue-router'
 
-const data = ref([])
+const data = reactive([])
 const isLoading = ref(false)
 const route = useRoute()
 const query = ref('')
+const page = ref(1)
 
 async function fetchNews() {
 	isLoading.value = true
 	const params = {
 		q: query.value,
 		pageSize: 10,
+		page: page.value,
 	}
 	try {
 		const response = await api.get('everything', { params })
@@ -29,18 +31,27 @@ async function fetchNews() {
 }
 
 function splitData(payload) {
+	console.log(payload)
 	const midIndex = Math.floor(payload.length / 2)
 	const firstPart = payload.slice(0, midIndex)
 	const secondPart = payload.slice(midIndex)
-	data.value = [firstPart, secondPart]
+	data.push(firstPart)
+	data.push(secondPart)
 }
 
 function setClass(index, layout) {
-	if (layout === 0 && index === 0) {
+	if (layout % 2 === 0 && index === 0) {
 		return true
-	} else if (layout === 1 && index === 4) {
+	} else if (layout % 2 === 1 && index === 4) {
 		return true
 	} else return false
+}
+
+async function handleLoadMore() {
+	isLoading.value = true
+	page.value += 1
+	await fetchNews()
+	isLoading.value = false
 }
 
 onMounted(async () => {
@@ -64,16 +75,26 @@ watch(route, async newValue => {
 		v-else
 		v-for="(layout, indexLayout) in data"
 		:key="indexLayout"
-		class="grid grid-cols-10 grid-flow-col gap-4 auto-cols-auto auto-rows-auto mb-4"
+		class="grid grid-cols-10 md:grid-flow-col gap-4 auto-cols-auto auto-rows-auto mb-4"
 	>
 		<div
 			v-for="(item, index) in layout"
 			:key="index"
 			:class="
-				setClass(index, indexLayout) ? 'col-span-4 row-span-2' : 'col-span-3'
+				setClass(index, indexLayout)
+					? 'col-span-10 md:col-span-4 md:row-span-2'
+					: 'col-span-10 md:col-span-3'
 			"
 		>
 			<Card :item="item" />
 		</div>
+	</div>
+	<div class="full-width flex items-center justify-center my-4">
+		<button
+			@click.stop="handleLoadMore()"
+			class="rounded-md bg-gray-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+		>
+			Load More
+		</button>
 	</div>
 </template>

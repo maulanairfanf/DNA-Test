@@ -1,10 +1,15 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
 
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 const query = ref('indonesia')
 const router = useRouter()
 const route = useRoute()
+
+const getRouteQuery = computed(() => {
+	if (route.query.q) return `/?q=${route.query.q}`
+	else return '/?q=indonesia'
+})
 
 function handleSearch() {
 	if (route.fullPath === '/') {
@@ -23,18 +28,18 @@ function handleSearch() {
 	}
 }
 
-onMounted(() => {
-	router.push({
-		query: {
-			q: query.value,
-		},
-	})
+watch(route, async newValue => {
+	if (newValue) {
+		query.value = newValue.query.q
+	}
 })
 </script>
 
 <template>
 	<header class="my-4">
-		<div class="flex items-center justify-between px-4 py-3 shadow-md">
+		<div
+			class="flex flex-wrap items-center justify-between px-4 py-3 shadow-md"
+		>
 			<div>
 				<input
 					type="text"
@@ -44,15 +49,15 @@ onMounted(() => {
 					v-model="query"
 				/>
 			</div>
-			<div>
+			<div class="block md:flex">
 				<router-link
-					to="/?q=indonesia"
-					class="px-2 py-1 text-black font-semibold rounded hover:bg-gray-50"
+					:to="getRouteQuery"
+					class="block px-2 py-1 text-black font-semibold rounded hover:bg-gray-50"
 					>Home</router-link
 				>
 				<router-link
 					to="recent"
-					class="px-2 py-1 text-black font-semibold rounded hover:bg-gray-50"
+					class="block px-2 py-1 text-black font-semibold rounded hover:bg-gray-50"
 					>Recent News</router-link
 				>
 			</div>

@@ -1,13 +1,11 @@
-<script setup></script>
-
 <template>
 	<div
 		class="rounded overflow-hidden shadow-lg w-full border h-full animate-pulse"
 	>
 		<img
-			class="w-full"
+			class="w-full h-72 object-cover"
 			src="https://as1.ftcdn.net/v2/jpg/02/68/55/60/1000_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg"
-			alt="Sunset in the mountains"
+			alt="Image Skeleton"
 		/>
 		<div class="px-6 py-4">
 			<div
