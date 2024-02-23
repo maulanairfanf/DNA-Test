@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import Card from './Card.vue'
 import Skeleton from './Skeleton.vue'
+import EmptyContent from '../reusable/EmptyContent.vue'
 
 const data = ref([])
 const isLoading = ref(false)
@@ -18,6 +19,9 @@ onMounted(() => {
 <template>
 	<div>
 		<Skeleton v-if="isLoading" />
+		<div v-else-if="data.length === 0">
+			<EmptyContent content="No recently read news" />
+		</div>
 		<div
 			v-else
 			class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 auto-cols-auto auto-rows-auto mb-4"

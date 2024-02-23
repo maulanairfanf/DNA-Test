@@ -1,9 +1,10 @@
 <script setup>
+import { onMounted, ref, watch, reactive } from 'vue'
 import Card from './Card.vue'
 import api from '../../hooks/api'
-import { onMounted, ref, watch, reactive } from 'vue'
 import Skeleton from './Skeleton.vue'
 import { useRoute } from 'vue-router'
+import EmptyContent from '../reusable/EmptyContent.vue'
 
 const data = reactive([])
 const isLoading = ref(false)
@@ -71,6 +72,9 @@ watch(route, async newValue => {
 	<div v-if="isLoading">
 		<Skeleton />
 	</div>
+	<div v-else-if="data.length === 0">
+		<EmptyContent content="News with that keyword was not found" />
+	</div>
 	<div
 		v-else
 		v-for="(layout, indexLayout) in data"
@@ -89,7 +93,10 @@ watch(route, async newValue => {
 			<Card :item="item" />
 		</div>
 	</div>
-	<div class="full-width flex items-center justify-center my-4">
+	<div
+		class="full-width flex items-center justify-center my-4"
+		v-if="data.length !== 0"
+	>
 		<button
 			@click.stop="handleLoadMore()"
 			class="rounded-md bg-gray-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
